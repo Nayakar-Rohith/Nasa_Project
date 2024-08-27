@@ -1,10 +1,10 @@
-const {getAllLaunches,postNewLaunch,httpAbortLaunch,existsLaunchId}=require('../../models/launches.model')
+const {getAllLaunches,saveNewLaunch,httpAbortLaunch,existsLaunchId}=require('../../models/launches.model')
 
 
-function getlaunchesController(req,res){
-    return res.status(200).json(getAllLaunches())
+async function getlaunchesController(req,res){
+    return res.status(200).json(await getAllLaunches())
 }
-function postlaunchesController(req,res){
+async function postlaunchesController(req,res){
     const launch=req.body;
     if(!launch.launchDate|| !launch.mission ||!launch.rocket||!launch.target){
         return res.status(400).json({error:"there is an error in the request data"})
@@ -14,15 +14,17 @@ function postlaunchesController(req,res){
     if (isNaN(launch.launchDate)){
         return res.status(400).json({error:"invalid date format"})
     }
-    postNewLaunch(launch)
+    await saveNewLaunch(launch)
     return res.status(201).json(launch)
 }
-function abortlaunchesController(req,res){
+async function abortlaunchesController(req,res){
     const launchId=Number(req.params.id);
-    if(!existsLaunchId(launchId)){
+    const exists=await existsLaunchId(launchId);
+
+    if(!exists){
         return res.status(404).json({error:'launch is not found'})
     }
-    const abort=httpAbortLaunch(launchId);
+    const abort=await httpAbortLaunch(launchId);
     return res.status(200).json(abort)
     
 
