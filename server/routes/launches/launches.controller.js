@@ -1,8 +1,9 @@
 const {getAllLaunches,saveNewLaunch,httpAbortLaunch,existsLaunchId}=require('../../models/launches.model')
-
+const {getPagination}=require('../../services/query')
 
 async function getlaunchesController(req,res){
-    return res.status(200).json(await getAllLaunches())
+    const {skip,limit}=getPagination(req.query)
+    return res.status(200).json(await getAllLaunches(skip,limit))
 }
 async function postlaunchesController(req,res){
     const launch=req.body;
